@@ -3,6 +3,9 @@ from methode_matrice_2D import methode_matrice_2D
 from calcul_energie_chauffage import calcul_energie_chauffage
 from calcul_energie_panneaux import calcul_energie_panneaux
 from graph_T import graph_T
+from graph_E_vs_p import graph_E_vs_p
+from graph_E_vs_taille import graph_E_vs_taille
+from graph_E_vs_ptaille import graph_E_vs_ptaille
 
 #import des fonctions externes
 import numpy as np
