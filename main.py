@@ -28,3 +28,9 @@ N = 0
 
 #Appel de nos fonctions
 methode_matrice_2D(C_p, K, rho, tau, Q_0, T_s, d_pS, p, l_x, l_z, temps, N)
+calcul_energie_chauffage()
+calcul_energie_panneaux()
+graph_T()
+graph_E_vs_p()
+graph_E_vs_taille()
+graph_E_vs_ptaille()

@@ -13,7 +13,7 @@ t=12
 
 eff = (15+23)/(2*100) # efficacite moyenne des panneaux solaires
 
-def calcul_energie(luminosite,distance, efficacite, aire, temps):
+def calcul_energie_panneaux(luminosite,distance, efficacite, aire, temps):
     I = luminosite/(4*np.pi*pow(distance,2)) # (W/m^2)
     print(I)
     I_eff = I*efficacite 
@@ -22,10 +22,10 @@ def calcul_energie(luminosite,distance, efficacite, aire, temps):
 
     return E
 
-calcul_energie(L, d_TS, eff, A_p, t)
-calcul_energie(L, d_MS, eff, A_p, t)
-calcul_energie(L, d_VS, eff, A_p, t)
-calcul_energie(L, d_ES, eff, A_p, t)
+calcul_energie_panneaux(L, d_TS, eff, A_p, t)
+calcul_energie_panneaux(L, d_MS, eff, A_p, t)
+calcul_energie_panneaux(L, d_VS, eff, A_p, t)
+calcul_energie_panneaux(L, d_ES, eff, A_p, t)
 
 
 #print(calcul_energie(L, d_TS, eff, A_p, t))
