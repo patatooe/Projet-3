@@ -79,7 +79,7 @@ def methode_matrice_2D(C_p, K, rho, tau, Q_0, T_s, d_pS, p, l_x, l_z, Lx, Lz, te
 C_p = 675
 K=1
 rho=2000
-tau=12
+tau=43200
 Q_0=492
 T_s=230
 d_pS=1
@@ -97,25 +97,26 @@ d=0.1 #(m)
 A, b, Nx, Nz = methode_matrice_2D(C_p=C_p, K=K, rho=rho, tau=tau, Q_0=Q_0, T_s=T_s, d_pS=d_pS, p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps = temps, d =d)
 
 # Résolution du système d'équations
-T=np.zeros((Nx*Nz,1),dtype=np.double)
-Tr=np.zeros((Nz,Nx),dtype=np.double)
+# T=np.zeros((Nx*Nz,1),dtype=np.double)
+# Tr=np.zeros((Nz,Nx),dtype=np.double)
 
-z = np.linspace(0, Lz, Nz)
-x= np.linspace(0, Lx, Nx)
+# z = np.linspace(0, Lz, Nz)
+# x= np.linspace(0, Lx, Nx)
 
-# T = spsolve(A.tocsr(), b) # À utiliser si matrice pleine
+# # T = spsolve(A.tocsr(), b) # À utiliser si matrice pleine
 
-T = np.linalg.solve(A, b) # À utiliser is matrice creuse
+# T = np.linalg.solve(A, b) # À utiliser is matrice creuse
 
-Tr=np.reshape(T,(Nz,Nx),order='F') # Convertion du vecteur colone de température en matrice dépendant de la position : T_ij->T(x,y)
+# Tr=np.reshape(T,(Nz,Nx),order='F') # Convertion du vecteur colone de température en matrice dépendant de la position : T_ij->T(x,y)
 
-# Affichage des données
-plt.figure(1)
-plt.pcolor(x,z,Tr)
-plt.colorbar(mappable=None, cax=None, ax=None)
-plt.title('T(x,y) [K]')
-plt.xlabel('x [m]')
-plt.ylabel('z [m]')
-plt.gca().invert_yaxis()
-plt.show()
+# # Affichage des données
+# plt.figure(1)
+# plt.pcolor(x,z,Tr)
+# plt.colorbar(mappable=None, cax=None, ax=None)
+# plt.title('T(x,y) [K]')
+# plt.xlabel('x [m]')
+# plt.ylabel('z [m]')
+# plt.gca().invert_yaxis()
+# plt.savefig('indepTemps.png')
+# plt.show()
 
