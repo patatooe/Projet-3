@@ -42,7 +42,7 @@ A0, b0, Nx, Nz = methode_matrice_2D(C_p=C_p, K=K, rho=rho, tau=tau, Q_0=Q_0, T_s
 
 
 Uo = np.matrix(np.zeros((Nx*Nz,1)))
-alpha = 5
+alpha = 1.48*10**(-6)
 
 #Définition Matrice M
 M = np.matrix(np.eye(Nx*Nz))
@@ -91,5 +91,5 @@ for t in tspace:
   os.remove(f'temperature2d{n}.png')
   n+=1
 
-imageio.v2.mimsave('temperature2d.gif', images)
+imageio.v2.mimsave('temperature2d_1.gif', images)
   

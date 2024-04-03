@@ -77,7 +77,7 @@ def methode_matrice_2D(C_p, K, rho, tau, Q_0, T_s, d_pS, p, l_x, l_z, Lx, Lz, te
 
 # Définition des constantes des planètes
 C_p = 675
-K=1
+K=2
 rho=2000
 tau=43200
 Q_0=492
@@ -96,7 +96,7 @@ d=0.1 #(m)
 # Obtention des matrices et du maillage
 A, b, Nx, Nz = methode_matrice_2D(C_p=C_p, K=K, rho=rho, tau=tau, Q_0=Q_0, T_s=T_s, d_pS=d_pS, p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps = temps, d =d)
 
-# Résolution du système d'équations
+# # Résolution du système d'équations
 # T=np.zeros((Nx*Nz,1),dtype=np.double)
 # Tr=np.zeros((Nz,Nx),dtype=np.double)
 
