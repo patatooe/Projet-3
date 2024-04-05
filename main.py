@@ -10,27 +10,32 @@ from graph_E_vs_ptaille import graph_E_vs_ptaille
 #import des fonctions externes
 import numpy as np
 import matplotlib.pyplot as plt
+import yaml
+from scipy.sparse import csc_matrix
+from scipy.sparse.linalg import spsolve
+import imageio.v2
+import os
+import time
 
 #Constantes
-C_p = 0
-K = 0
-rho = 0 
-tau = 0 
-Q_0 = 0 
-T_s = 0 
-d_pS = 0 
-p = 0
-l_x = 0 
-l_z = 0
-temps = 0 
-N = 0
+with open('constants.yaml') as f:
+    planets_constants = yaml.safe_load(f)
+
+p = 3   # Profondeur de l'abris [m]
+l_x = 3 # Largeur de l'abris en x [m]
+l_z = 3 # Hauteur de l'abris en z [m]
+L_x = 5 # Largeur du domaine [m]
+L_z = 10 # Hauteur du domaine [m]
+d = 0.1  # Pas de discrétisation [m]
+
+
 
 
 #Appel de nos fonctions
-methode_matrice_2D(C_p, K, rho, tau, Q_0, T_s, d_pS, p, l_x, l_z, temps, N)
-calcul_energie_chauffage()
-calcul_energie_panneaux()
-graph_T()
-graph_E_vs_p()
-graph_E_vs_taille()
-graph_E_vs_ptaille()
+# methode_matrice_2D(C_p, K, rho, tau, Q_0, T_s, d_pS, p, l_x, l_z, temps, N)
+# calcul_energie_chauffage()
+# calcul_energie_panneaux()
+# graph_T()
+# graph_E_vs_p()
+# graph_E_vs_taille()
+# graph_E_vs_ptaille()

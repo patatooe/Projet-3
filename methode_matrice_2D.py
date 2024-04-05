@@ -2,11 +2,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.sparse import lil_matrix
 from scipy.sparse.linalg import spsolve
+import yaml
 
 
 
-def methode_matrice_2D(C_p, K, rho, tau, Q_0, T_s, d_pS, p, l_x, l_z, Lx, Lz, temps, d , sparse = False):
+def methode_matrice_2D(planete, p, l_x, l_z, Lx, Lz, temps, d , sparse = False):
 
+    # Récupération des constantes de la planète
+    C_p = planete['C_p']
+    K = planete['K']
+    rho = planete['rho']
+    tau = planete['tau']
+    Q_0 = planete['Q_0']
+    T_s = planete['T_s']
+    d_pS = planete['d_pS']
     sigma = 5.67e-8 # (W/(m^2K^4)) Constante de Stefan-Boltzmann
     
     Nx=int(np.rint(Lx/d+1)) # Nombre de nœuds le long de X
@@ -21,7 +30,7 @@ def methode_matrice_2D(C_p, K, rho, tau, Q_0, T_s, d_pS, p, l_x, l_z, Lx, Lz, te
     
     # Définition de la source de chaleur S(t)=Q_0(1+cos(2pi*t/tau))
     def St(Q_0, d_pS, tau, temps):
-       S = Q_0*(1+np.cos(temps*2*np.pi/tau))
+       S = Q_0 #*(1+np.cos(temps*2*np.pi/tau))
        return S
     
     def Aindex(i,j): #Associé la case i,j à sa colone dans la matrice M
@@ -58,9 +67,9 @@ def methode_matrice_2D(C_p, K, rho, tau, Q_0, T_s, d_pS, p, l_x, l_z, Lx, Lz, te
              A[Aindex(i,j),Aindex(i,j-2)] = 1
            
            # Temperature à 394 K pour tous les points dans l'abris
-           elif i > p/d+1  and i < (l_z+p)/d+1 and j < l_x/(2*d)+1:
-             A[Aindex(i,j), Aindex(i,j)] = 1
-             b[Aindex(i,j)] = 294
+          #  elif i > p/d+1  and i < (l_z+p)/d+1 and j < l_x/(2*d)+1:
+          #    A[Aindex(i,j), Aindex(i,j)] = 1
+          #    b[Aindex(i,j)] = 294
            
            # Tous les autres points
            elif j > 1 and j < Nx and i > 1 and i < Nz  :
@@ -75,28 +84,31 @@ def methode_matrice_2D(C_p, K, rho, tau, Q_0, T_s, d_pS, p, l_x, l_z, Lx, Lz, te
 
     return A, b, Nx, Nz
 
-# Définition des constantes des planètes
-C_p = 675
-K=1
-rho=2000
-tau=43200
-Q_0=492
-T_s=230
-d_pS=1
+# # Définition des constantes des planètes
+# C_p = 675
+# K=1
+# rho=2000
+# tau=43200
+# Q_0=492
+# T_s=305.2
+# d_pS=1
 
-# Variables pouvant changer
-p=3 # (m)
-l_x=3 # (m)
-l_z=3 #(m)
-Lx=5 #(m)
-Lz=10 #(m)
-temps=0 #(s)
-d=0.1 #(m)
+# # Variables pouvant changer
+# p=3 # (m)
+# l_x=3 # (m)
+# l_z=3 #(m)
+# Lx=1 #(m)
+# Lz=10 #(m)
+# temps=0 #(s)
+# d=0.1 #(m)
 
-# Obtention des matrices et du maillage
-A, b, Nx, Nz = methode_matrice_2D(C_p=C_p, K=K, rho=rho, tau=tau, Q_0=Q_0, T_s=T_s, d_pS=d_pS, p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps = temps, d =d)
+# with open('constants.yaml') as f:
+#     planets_constants = yaml.safe_load(f)
 
-# Résolution du système d'équations
+# # Obtention des matrices et du maillage
+# A, b, Nx, Nz = methode_matrice_2D(planets_constants['earth'], p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps = temps, d =d)
+
+# # Résolution du système d'équations
 # T=np.zeros((Nx*Nz,1),dtype=np.double)
 # Tr=np.zeros((Nz,Nx),dtype=np.double)
 
