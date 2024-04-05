@@ -24,10 +24,12 @@ with open('constants.yaml') as f:
 p = 3   # Profondeur de l'abris [m]
 l_x = 3 # Largeur de l'abris en x [m]
 l_z = 3 # Hauteur de l'abris en z [m]
-L_x = 5 # Largeur du domaine [m]
-L_z = 10 # Hauteur du domaine [m]
+Lx = 5 # Largeur du domaine [m]
+Lz = 10 # Hauteur du domaine [m]
 d = 0.1  # Pas de discrétisation [m]
 
+Nx=int(np.rint(Lx/d+1)) # Nombre de nœuds le long de X
+Nz=int(np.rint(Lz/d+1)) # Nombre de nœuds le long de Z
 
 
 

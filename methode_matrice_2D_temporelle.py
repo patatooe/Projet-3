@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from methode_matrice_2D import methode_matrice_2D
+from methode_matrice_2D import methode_matrice_2D_A
+from methode_matrice_2D import methode_matrice_2D_b
 import imageio.v2
 import os
 from scipy.sparse import lil_matrix
@@ -57,7 +59,12 @@ def methode_matrice_2D_temporelle(planete,  p, l_x, l_z, Lx, Lz, d):
             dt = {dt}, alpha*d^2={alpha*d**2} 
         ##################################################""")
 
-    A, b0, Nx, Nz = methode_matrice_2D(planete, p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps=0, d=d, sparse=False)
+    # Calculs des matrices initiales et indépendantes du temps
+    b0 = methode_matrice_2D_b(planete, p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps=0, d=d, sparse=False)
+    A = methode_matrice_2D_A(planete, p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps=0, d=d, sparse=False)
+    
+    # Construction de A_prime
+    A_prime = M - (dt / (alpha * d**2)) * xi * A
 
     # Initialisation de la boucle avec U0 et b0
     Un = U0
@@ -68,16 +75,15 @@ def methode_matrice_2D_temporelle(planete,  p, l_x, l_z, Lx, Lz, d):
 
     n=0 # Compteur d'itérations
     for t in np.linspace(0, temps_eval, nb_iterations):
-        A, bn_1, Nx, Nz = methode_matrice_2D(planete, p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps=t, d=d, sparse=False)
+        bn_1 = methode_matrice_2D_b(planete, p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps=t, d=d, sparse=False)
     
-        # Construction A_prime
-        A_prime = M - (dt / (alpha * d**2)) * xi * A
 
         # Construction b_prime
-        b_prime = M.dot(Un) + (dt / (alpha * d**2)) * (1 - xi) * A.dot(Un) - dt / (alpha * d**2) * (xi * bn_1 + (1 - xi) * bn)
+        # b_prime = M.dot(Un) + (dt / (alpha * d**2)) * (1 - xi) * A.dot(Un) - dt / (alpha * d**2) * (xi * bn_1 + (1 - xi) * bn)
+        b_prime = (M + dt / (alpha * d**2) * (1 - xi) * A) @ Un - dt / (alpha * d**2) * (xi * bn_1 + (1 - xi) * bn)
 
         # Solve for Un_1 using sparse solver
-        Un_1 = spsolve(A_prime, b_prime)
+        Un_1 = np.linalg.solve(A_prime, b_prime)
         
         # Redéfinition des variables pour la prochaine itération 
         Un = np.reshape(Un_1, (len(Un_1), 1))
@@ -109,7 +115,7 @@ with open('constants.yaml') as f:
 p = 3   # Profondeur de l'abris [m]
 l_x = 3 # Largeur de l'abris en x [m]
 l_z = 3 # Hauteur de l'abris en z [m]
-Lx = 5 # Largeur du domaine [m]
+Lx = 1 # Largeur du domaine [m]
 Lz = 10 # Hauteur du domaine [m]
 d = 0.1  # Pas de discrétisation [m]
 
