@@ -6,7 +6,7 @@ from methode_matrice_2D import methode_matrice_2D_b
 import imageio.v2
 import os
 from scipy.sparse import lil_matrix
-from scipy.sparse import csc_matrix
+from scipy.sparse import csc_matrix, csr_matrix, diags
 from scipy.sparse.linalg import spsolve
 import time
 import yaml
@@ -42,6 +42,7 @@ def methode_matrice_2D_temporelle(planete,  p, l_x, l_z, Lx, Lz, d):
     M = np.matrix(np.eye(Nx*Nz))
     M[0,0]=0
     M[Nx*Nz-1,Nx*Nz-1]=0
+    M = csr_matrix(M)
     # M = csc_matrix(M)
 
     # Échelle de temps étudiée
@@ -60,9 +61,12 @@ def methode_matrice_2D_temporelle(planete,  p, l_x, l_z, Lx, Lz, d):
         ##################################################""")
 
     # Calculs des matrices initiales et indépendantes du temps
-    b0 = methode_matrice_2D_b(planete, p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps=0, d=d, sparse=False)
-    A = methode_matrice_2D_A(planete, p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps=0, d=d, sparse=False)
-    
+    # b0 = methode_matrice_2D_b(planete, p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps=0, d=d, sparse=False)
+    # A = methode_matrice_2D_A(planete, p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps=0, d=d, sparse=True)
+
+    A, b0, Nx, Nz = methode_matrice_2D(planete, p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps=0, d=d, sparse=True)
+
+
     # Construction de A_prime
     A_prime = M - (dt / (alpha * d**2)) * xi * A
 
@@ -74,16 +78,14 @@ def methode_matrice_2D_temporelle(planete,  p, l_x, l_z, Lx, Lz, d):
     images = []
 
     n=0 # Compteur d'itérations
-    for t in np.linspace(0, temps_eval, nb_iterations):
-        bn_1 = methode_matrice_2D_b(planete, p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps=t, d=d, sparse=False)
-    
+    for t in np.linspace(dt, temps_eval, nb_iterations+1):
+        A, bn_1,Nx, Nz = methode_matrice_2D(planete, p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps=t, d=d, sparse=True)
 
-        # Construction b_prime
-        # b_prime = M.dot(Un) + (dt / (alpha * d**2)) * (1 - xi) * A.dot(Un) - dt / (alpha * d**2) * (xi * bn_1 + (1 - xi) * bn)
+
         b_prime = (M + dt / (alpha * d**2) * (1 - xi) * A) @ Un - dt / (alpha * d**2) * (xi * bn_1 + (1 - xi) * bn)
-
+        
         # Solve for Un_1 using sparse solver
-        Un_1 = np.linalg.solve(A_prime, b_prime)
+        Un_1 = spsolve(A_prime, b_prime)
         
         # Redéfinition des variables pour la prochaine itération 
         Un = np.reshape(Un_1, (len(Un_1), 1))
@@ -118,5 +120,6 @@ l_z = 3 # Hauteur de l'abris en z [m]
 Lx = 1 # Largeur du domaine [m]
 Lz = 10 # Hauteur du domaine [m]
 d = 0.1  # Pas de discrétisation [m]
+
 
 methode_matrice_2D_temporelle(planets_constants['earth'],  p, l_x, l_z, Lx, Lz, d)
