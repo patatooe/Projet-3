@@ -25,7 +25,7 @@ def methode_matrice_2D_temporelle(planete,  p, l_x, l_z, Lx, Lz, d):
 
     alpha = C_p*rho/K # Constante de propagation (*****)
 
-    xi = 0.75 # Paramètre xi de la méthode
+    xi = 0.5 # Paramètre xi de la méthode
 
     # Définition des tailles du domaine 
     Nx=int(np.rint(Lx/d+1)) # Nombre de nœuds le long de X
@@ -36,7 +36,7 @@ def methode_matrice_2D_temporelle(planete,  p, l_x, l_z, Lx, Lz, d):
     x = np.linspace(0, Lx, Nx)
 
     # Définition de la distribution de température initiale 
-    U0 = np.matrix(np.full((Nx*Nz,1), 2*T_s))
+    U0 = np.matrix(np.full((Nx*Nz,1), T_s))
 
     # Définition de la matrice M
     M = np.matrix(np.eye(Nx*Nz))
@@ -46,8 +46,9 @@ def methode_matrice_2D_temporelle(planete,  p, l_x, l_z, Lx, Lz, d):
     # M = csc_matrix(M)
 
     # Échelle de temps étudiée
-    dt = 10000  # Pas de temps
-    nb_iterations = 20  # Nombre d'itération de temps
+    dt = np.min([(alpha*d**2)/10, tau/20])
+    print(dt)  # Pas de temps
+    nb_iterations = 62  # Nombre d'itération de temps
     temps_eval = dt*nb_iterations # Temps total d'évaluation
 
     print(f'Évaluation sur {temps_eval} s avec {nb_iterations} itérations')
@@ -97,7 +98,7 @@ def methode_matrice_2D_temporelle(planete,  p, l_x, l_z, Lx, Lz, d):
         # Eneregistre les images seulement pour certaines itérations
         if n % 1 == 0:
             plt.clf()
-            plt.pcolor(x, z, np.array(Tr), vmin=300, vmax=625)
+            plt.pcolor(x, z, np.array(Tr), vmin=np.min(np.array(Tr)), vmax=np.max(np.max(np.array(Tr))))
             plt.colorbar(mappable=None, cax=None, ax=None)
             plt.title('T(x,y) [K]')
             plt.xlabel('x [m]')
@@ -118,8 +119,8 @@ p = 3   # Profondeur de l'abris [m]
 l_x = 3 # Largeur de l'abris en x [m]
 l_z = 3 # Hauteur de l'abris en z [m]
 Lx = 1 # Largeur du domaine [m]
-Lz = 10 # Hauteur du domaine [m]
-d = 0.1  # Pas de discrétisation [m]
+Lz = 3 # Hauteur du domaine [m]
+d = 0.01  # Pas de discrétisation [m]
 
 
 methode_matrice_2D_temporelle(planets_constants['earth'],  p, l_x, l_z, Lx, Lz, d)
