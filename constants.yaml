@@ -13,7 +13,7 @@ venus:
   C_p: 1000 # Capacité thermique [J/kgK]
   K: 2    # Conductivité thermique [W/mK]
   rho: 3000  # Masse volumique [kg/m^3]
-  tau: 1.05e7    # Période de rotation [s]
+  tau: 10500000    # Période de rotation [s]
   Q_0: 70    # Rayonnement solaire [W/m^2]
   T_s: 187.4    # Température moyenne [K]
   d_pS: 0.72   # Distance Planète-Soleil [AU]
