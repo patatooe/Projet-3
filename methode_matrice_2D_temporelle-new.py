@@ -25,7 +25,7 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d ):
 
     alpha=C_p*rho/K
 
-    xi =0.5
+    xi =1
 
     # Calcul du nombre de points en x et z
     Nx=int(np.rint(Lx/d+1)) # Nombre de nœuds le long de X
@@ -34,8 +34,8 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d ):
     x= np.linspace(0, Lx, Nx)
 
     # Calcul de la distribution initiale
-    # U0 = distributionInitiale(Nx, Nz, Lx, Lz, T_s)
-    U0 = np.full((Nx*Nz,1), T_s)
+    U0 = distributionInitiale(Nx, Nz, Lx, Lz, T_s, l_x, l_z, p)
+    # U0 = np.full((Nx*Nz,1), T_s)
     U0r = np.reshape(U0,(Nz,Nx),order='F')
     plot_temperature(x,z,U0r, 'distribInitiale') # Graphique de Distribution initiale
 
@@ -46,8 +46,8 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d ):
     b0 = methode_matrice_2D_b(planete, p, l_x, l_z, Lx, Lz, temps=0, d=d, abri=abri)
 
     # Définition du pas de temps
-    dt = np.min([alpha*d**2/4, tau/20 ])
-    nb_iterations = 320
+    dt = np.min([alpha*d**2/2, tau/5 ])
+    nb_iterations = 120
     temps_deval = dt*nb_iterations
 
     if dt>(alpha*d**2) or dt>tau/10 :
@@ -87,8 +87,21 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d ):
 
         b_prime = b_prime_1 - b_prime_2
 
+        def Aindex(i,j): #Associé la case i,j à sa colone dans la matrice M
+            index=(j-1)*Nz+i
+            return index-1
+
+        
+
+
         Un_1 = spsolve(A_prime, b_prime)
+        # for i in np.arange(1,Nz+1,1): #i=1,..,Nz - numérotation des nœuds sur un maillage physique
+        #     for j in np.arange(1,Nx+1,1): #j=1,..,Nx - numérotation des nœuds sur un maillage physique
+        #         if i > p/d+1  and i < (l_z+p)/d+1 and j < l_x/(2*d)+1 and abri:
+        #             Un_1[Aindex(i,j)] = 294.15
+        #         else : continue
         Un=Un_1
+
 
         # Plot du graphique au temps t
         Unr = np.reshape(Un_1,(Nz,Nx),order='F')
@@ -107,12 +120,12 @@ CALCUL TERMINÉ : ANIMATION SAUVEGARDÉE
 with open('constants.yaml') as f:
     planets_constants = yaml.safe_load(f)
 
-p = 3   # Profondeur de l'abris [m]
-l_x = 3 # Largeur de l'abris en x [m]
-l_z = 3 # Hauteur de l'abris en z [m]
-Lx = 10 # Largeur du domaine [m]
-Lz = 10 # Hauteur du domaine [m]
-d = 0.1  # Pas de discrétisation [m]
+p = 0.5   # Profondeur de l'abris [m]
+l_x = 1 # Largeur de l'abris en x [m]
+l_z = 1 # Hauteur de l'abris en z [m]
+Lx = 3 # Largeur du domaine [m]
+Lz = 3 # Hauteur du domaine [m]
+d = 0.05  # Pas de discrétisation [m]
 
 
 methode_matrice_2D_temporelle(planets_constants['earth'],  p, l_x, l_z, Lx, Lz, d)

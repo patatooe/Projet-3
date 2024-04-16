@@ -21,7 +21,7 @@ venus:
 # Constantes de Mars
 mars:
   C_p: 500 # Capacité thermique [J/kgK]
-  K: 0.039    # Conductivité thermique [W/mK]
+  K: 0.8    # Conductivité thermique [W/mK]
   rho: 1500  # Masse volumique [kg/m^3]
   tau: 44280    # Période de rotation [s]
   Q_0: 308    # Rayonnement solaire [W/m^2]
@@ -29,7 +29,7 @@ mars:
   d_pS: 1.52   # Distance Planète-Soleil [AU]
 
 # Constantes de Europe
-mars:
+europe:
   C_p: 750 # Capacité thermique [J/kgK]
   K: 7        # Conductivité thermique [W/mK]
   rho: 2750  # Masse volumique [kg/m^3]
