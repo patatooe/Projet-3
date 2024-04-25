@@ -88,20 +88,8 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d ):
         b_prime_2 = (dt/(alpha*d**2)*(xi*bn_1+(1-xi)*bn)).flatten()
 
         b_prime = b_prime_1 - b_prime_2
-
-        def Aindex(i,j): #Associé la case i,j à sa colone dans la matrice M
-            index=(j-1)*Nz+i
-            return index-1
-
         
-
-
         Un_1 = spsolve(A_prime, b_prime)
-        # for i in np.arange(1,Nz+1,1): #i=1,..,Nz - numérotation des nœuds sur un maillage physique
-        #     for j in np.arange(1,Nx+1,1): #j=1,..,Nx - numérotation des nœuds sur un maillage physique
-        #         if i > p/d+1  and i < (l_z+p)/d+1 and j < l_x/(2*d)+1 and abri:
-        #             Un_1[Aindex(i,j)] = 294.15
-        #         else : continue
         Un=Un_1
 
 
@@ -113,7 +101,7 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d ):
 
         n=n+1
 
-    imageio.v2.mimsave('temperatureVenus.gif', images)
+    imageio.v2.mimsave('temperatureEarth.gif', images)
 
     print(f""" 
 CALCUL TERMINÉ : ANIMATION SAUVEGARDÉE
@@ -129,4 +117,4 @@ Lz = 3 # Hauteur du domaine [m]
 d = 0.05  # Pas de discrétisation [m]
 
 
-methode_matrice_2D_temporelle(planets_constants['venus'],  p, l_x, l_z, Lx, Lz, d)
+methode_matrice_2D_temporelle(planets_constants['earth'],  p, l_x, l_z, Lx, Lz, d)
