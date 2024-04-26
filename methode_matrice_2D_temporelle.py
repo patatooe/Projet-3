@@ -99,22 +99,44 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d ):
         images.append(imageio.v2.imread(f'temperature2d{n}.png'))
         os.remove(f'temperature2d{n}.png')
 
+        Energy = []
+        if t>tau:
+            #ENERGIE CODE*****************************************************************************
+            dT_tot = 0
+            for i in range(Nz):
+                for j in range(Nx):
+                    if (p/d-1) > i > (p/d+1) and j <= (l_x/(2*d)+1):
+                        dT_up = (Unr[i,j] - Unr[i-1,j])/(d)
+                        dT_tot += abs(dT_up)
+                    if ((l_z+p)/d-1)< i < ((l_z+p)/d+1) and j <= (l_x/(2*d)+1):
+                        dT_down = (Unr[i+1,j] - Unr[i,j])/(d)
+                        dT_tot += abs(dT_down)
+                    if i >= (p/d+1)  and  i <= ((l_z+p)/d+1) and (l_x/(2*d)-1) < j < (l_x/(2*d)+1):
+                        dT_side = (Unr[i,j+1] + Unr[i,j])/(d)
+                        dT_tot += abs(dT_side)
+        
+            Energy.append((2*l_x+l_z)*dT_tot)
+            #ENERGIE FIN***********************************************************************************
+        
+
+
         n=n+1
 
     imageio.v2.mimsave('temperatureEarth.gif', images)
+    return np.sum(np.array(Energy))
 
     print(f""" 
 CALCUL TERMINÉ : ANIMATION SAUVEGARDÉE
 #######################################################################################################""")
-with open('constants.yaml') as f:
-    planets_constants = yaml.safe_load(f)
+# with open('constants.yaml') as f:
+#     planets_constants = yaml.safe_load(f)
 
-p = 1   # Profondeur de l'abris [m]
-l_x = 1 # Largeur de l'abris en x [m]
-l_z = 1 # Hauteur de l'abris en z [m]
-Lx = 3 # Largeur du domaine [m]
-Lz = 3 # Hauteur du domaine [m]
-d = 0.05  # Pas de discrétisation [m]
+# p = 1   # Profondeur de l'abris [m]
+# l_x = 1 # Largeur de l'abris en x [m]
+# l_z = 1 # Hauteur de l'abris en z [m]
+# Lx = 3 # Largeur du domaine [m]
+# Lz = 3 # Hauteur du domaine [m]
+# d = 0.05  # Pas de discrétisation [m]
 
 
-methode_matrice_2D_temporelle(planets_constants['earth'],  p, l_x, l_z, Lx, Lz, d)
+# methode_matrice_2D_temporelle(planets_constants['earth'],  p, l_x, l_z, Lx, Lz, d)
