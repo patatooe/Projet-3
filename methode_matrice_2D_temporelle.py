@@ -2,154 +2,159 @@ import numpy as np
 import matplotlib.pyplot as plt
 from methode_matrice_2D import methode_matrice_2D_A
 from methode_matrice_2D import methode_matrice_2D_b
+from distributionInitiale import distributionInitiale
+from plot_temperature import plot_temperature
 import imageio.v2
 import os
-from scipy.sparse import lil_matrix
-from scipy.sparse import csc_matrix, csr_matrix, diags, eye
+from scipy.sparse import lil_matrix, csc_matrix, csr_matrix, diags, eye
+import scipy.sparse as sp
 from scipy.sparse.linalg import spsolve
 import time
 import yaml
+from tqdm import tqdm
 
+def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d ):
+    # Définition des constantes
+    C_p = planete['C_p']
+    K = planete['K']
+    rho = planete['rho']
+    tau = planete['tau']
+    Q_0 = planete['Q_0']
+    T_s = planete['T_s']
+    d_pS = planete['d_pS']
 
-def methode_matrice_2D_temporelle(planete,  p, l_x, l_z, Lx, Lz, d):
+    alpha=C_p*rho/K
 
-    # Récupération des constantes de la planète
-    C_p = planete['C_p']    # Capacité thermique [J/kgK]
-    K = planete['K']        # Conductivité thermique [W/mK]
-    rho = planete['rho']    # Masse volumique [kg/m^3]
-    tau = planete['tau']    # Période de rotation [s]
-    Q_0 = planete['Q_0']    # Rayonnement solaire [W/m^2]
-    T_s = planete['T_s']    # Température moyenne [K]
-    d_pS = planete['d_pS']  # Distance Planète-Soleil [AU]
+    xi =1
 
-    alpha = C_p*rho/K # Constante de propagation
-
-    xi = 0.5 # Paramètre xi de la méthode
-
-    # Définition des tailles du domaine
+    # Calcul du nombre de points en x et z
     Nx=int(np.rint(Lx/d+1)) # Nombre de nœuds le long de X
     Nz=int(np.rint(Lz/d+1)) # Nombre de nœuds le long de Z
-
-    # Prédéfinition des vecteurs positions
     z = np.linspace(0, Lz, Nz)
-    x = np.linspace(0, Lx, Nx)
+    x= np.linspace(0, Lx, Nx)
 
-    # Définition de la distribution de température initiale
-    # U0 = np.matrix(np.full((Nx*Nz,1), T_s))
-
-    def initial_gaussian_distribution(Nx, Nz, Lx, Lz, Ts):
-        # Création d'une grille Nx par Nz
-        x = np.linspace(0, Lx, Nx)
-        z = np.linspace(0, Lz, Nz)
-        X, Z = np.meshgrid(x, z)
-
-        # Paramètres de la gaussienne centrée
-        sigma_x = Lx / 20  # Largeur de la gaussienne en x
-        sigma_z = Lz / 20  # Largeur de la gaussienne en z
-        mu_x = Lx / 2      # Position x du centre de la gaussienne
-        mu_z = Lz / 2      # Position z du centre de la gaussienne
-
-        # Calcul de la distribution gaussienne 2D
-        gauss_dist = np.exp(-((X-mu_x)**2 / (2 * sigma_x**2) + (Z-mu_z)**2 / (2 * sigma_z**2)))
-
-        # Ajustement pour le minimum et le maximum
-        gauss_dist = Ts + (2 * Ts - Ts) * gauss_dist
-
-        gauss_dist_col = np.ravel(gauss_dist, order='F')
-
-        return gauss_dist_col
-
-    U0 = initial_gaussian_distribution(Nx, Nz, Lx, Lz, T_s)
+    # Calcul de la distribution initiale
+    U0 = distributionInitiale(Nx, Nz, Lx, Lz, T_s, l_x, l_z, p)
+    # U0 = np.full((Nx*Nz,1), T_s)
     U0r = np.reshape(U0,(Nz,Nx),order='F')
+    plot_temperature(x,z,U0r, 'distribInitiale') # Graphique de Distribution initiale
 
-    # Impression de la distribution de température initiale
-    plt.figure(1)
-    plt.pcolor(x, z, U0r, cmap='hot')
-    plt.colorbar(mappable=None, cax=None, ax=None)
-    plt.title('T$_0$(x,y) [K]')
-    plt.xlabel('x [m]')
-    plt.ylabel('z [m]')
-    plt.gca().invert_yaxis()
-    plt.savefig('distribInitiale.png')
+    # Définition des matrices A, M et b0
+    abri = True # Est-ce qu'il y a un abri
 
+    A, M = methode_matrice_2D_A(planete, p, l_x, l_z, Lx, Lz, d, abri=abri)
+    b0 = methode_matrice_2D_b(planete, p, l_x, l_z, Lx, Lz, temps=0, d=d, abri=abri)
 
-    # Définition de la matrice M
-    M = eye(Nx*Nz, format='csr')
-    M[0, 0] = 0
-    M[Nx*Nz-1, Nx*Nz-1] = 0
+    # Définition du pas de temps
+    dt = np.min([alpha*d**2/2, tau/5 ]) #1875 ou 2100000
+    nb_iterations = 100
+    temps_deval = dt*nb_iterations
+    temps_deval = 2*tau
+    dt = temps_deval/nb_iterations
 
-    # Échelle de temps étudiée
-    dt = np.min([(alpha*d**2)/10, tau/20])
-    nb_iterations = 62  # Nombre d'itération de temps
-    temps_eval = dt*nb_iterations # Temps total d'évaluation
-
-    print(f'Évaluation sur {temps_eval} s avec {nb_iterations} itérations. Pas de {dt} s')
-
-    # Condition de convergence
-    if dt>(alpha*d**2) :
+    if dt>(alpha*d**2) or dt>tau/10 :
         print(f"""
         ##################################################
          ATTENTION! : CRITÈRE DE CONVERGENCE NON RESPECTÉ
-            dt = {dt}, alpha*d^2={alpha*d**2}
-        ##################################################""")
+            dt = {dt}, alpha*d^2={alpha*d**2}, tau = {tau}
+        ##################################################""")    
 
-    # Calculs des matrices initiales et indépendantes du temps
-    A = methode_matrice_2D_A(planete, p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, d=d, sparse=True)
-    b0 = methode_matrice_2D_b(planete, p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps=0, d=d)
+    # Définition de A_prime
+    A_prime = M - dt*xi/(alpha*d**2)*A
 
-    # Construction de A_prime
-    A_prime = M - (dt / (alpha * d**2)) * xi * A
-
-    # Initialisation de la boucle avec U0 et b0
-    Un = U0
-    bn = b0
-
-    # Liste pour enregistrer les images
+    # Images
     images = []
 
-    n=0 # Compteur d'itérations
-    for t in np.linspace(dt, temps_eval, nb_iterations+1):
-        bn_1 = methode_matrice_2D_b(planete, p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps=t, d=d)
+    # Définition des paramètres initiales
+    bn = b0
+    Un = U0
+
+    n=0
+    print(f""" #######################################################################################################
+    DÉBUT DU CALCUL 
+    PARAMÈTRES : 
+    - Domaine : {Lx}x{Lz} m 
+    - Abri : {abri}, {l_x}x{l_z} m
+    - Discrétisation : Pas de {d} m avec {Nx}x{Nz} points
+    - Temps: Évaluation sur {temps_deval} avec un pas de {dt} s sur {nb_iterations} itérations
+--------------------------------------------------------------------------------------------------------
+    Progression :""")
+    Energy = []
+    for t in tqdm(np.arange(dt, temps_deval, dt), total=nb_iterations):
+        bn_1 = methode_matrice_2D_b(planete, p, l_x, l_z, Lx, Lz, temps=t, d=d, abri=abri)
 
 
-        b_prime = (M + dt / (alpha * d**2) * (1 - xi) * A) @ Un - dt / (alpha * d**2) * (xi * bn_1 + (1 - xi) * bn)
+        b_prime_1 = (M + dt*(1-xi)/(alpha*d**2)*A).dot(Un).flatten()
+        b_prime_2 = (dt/(alpha*d**2)*(xi*bn_1+(1-xi)*bn)).flatten()
 
-        # Solve for Un_1 using sparse solver
+        b_prime = b_prime_1 - b_prime_2
+
+        def Aindex(i,j): #Associé la case i,j à sa colone dans la matrice M
+            index=(j-1)*Nz+i
+            return index-1
+
+        
+
+
         Un_1 = spsolve(A_prime, b_prime)
+        # for i in np.arange(1,Nz+1,1): #i=1,..,Nz - numérotation des nœuds sur un maillage physique
+        #     for j in np.arange(1,Nx+1,1): #j=1,..,Nx - numérotation des nœuds sur un maillage physique
+        #         if i > p/d+1  and i < (l_z+p)/d+1 and j < l_x/(2*d)+1 and abri:
+        #             Un_1[Aindex(i,j)] = 294.15
+        #         else : continue
+        Un=Un_1
 
-        # Redéfinition des variables pour la prochaine itération
-        Un = np.reshape(Un_1, (len(Un_1), 1))
-        bn = np.reshape(bn_1, (len(bn_1), 1))
 
-        # Convertion du vecteur colone de température en matrice dépendant de la position : T_ij->T(x,y)
-        Tr = np.reshape(Un, (Nz, Nx), order='F')
 
-        # Eneregistre les images seulement pour certaines itérations
-        if n % 1 == 0:
-            plt.clf()
-            plt.pcolor(x, z, np.array(Tr), cmap='hot', vmin=np.min(np.array(Tr)), vmax=np.max(np.max(np.array(Tr))))
-            plt.colorbar(mappable=None, cax=None, ax=None)
-            plt.title('T(x,y) [K]')
-            plt.xlabel('x [m]')
-            plt.ylabel('z [m]')
-            plt.gca().invert_yaxis()
-            plt.savefig(f'temperature2d{n}.png')
-            images.append(imageio.v2.imread(f'temperature2d{n}.png'))
-            os.remove(f'temperature2d{n}.png')
-        n += 1
 
-    # Save animation
-    imageio.v2.mimsave('temperature2d.gif', images)
+ 
+        if t>tau:
+            #ENERGIE CODE*****************************************************************************
+            print(t)
+            dT_tot = 0
+            dT_up = []
+            dT_down = []
+            dT_side = []
+            for i in range(Nz):
+                for j in range(Nx):
+                    if (p/d-1) > i > (p/d+1) and j <= (l_x/(2*d)+1):
+                        dT_up.append((Unr[i,j] - Unr[i-1,j])/(d))
+                    if ((l_z+p)/d-1)< i < ((l_z+p)/d+1) and j <= (l_x/(2*d)+1):
+                        dT_down.append((Unr[i+1,j] - Unr[i,j])/(d))
+                    if i >= (p/d+1)  and  i <= ((l_z+p)/d+1) and (l_x/(2*d)-1) < j < (l_x/(2*d)+1):
+                        dT_side.append((Unr[i,j+1] + Unr[i,j])/(d))
+            P_up = K*sum(dT_up)*(l_x*l_x)
+            P_down = K*sum(dT_down)*(l_x*l_x)
+            P_side = K*sum(dT_side)*(l_z*l_x)
+            Energy.append(P_down + P_up + P_side)
+            #ENERGIE FIN***********************************************************************************
 
+        # Plot du graphique au temps t
+        Unr = np.reshape(Un_1,(Nz,Nx),order='F')
+        plot_temperature(x,z,Unr, f'temperature2d{n}')
+        images.append(imageio.v2.imread(f'temperature2d{n}.png'))
+        os.remove(f'temperature2d{n}.png')
+
+        n=n+1
+
+    print(temps_deval)
+    imageio.v2.mimsave('temperatureVenus.gif', images)
+    #ENERGIE CODE*****************************************************************************
+    print("Energy totale = ", 2*sum(Energy)/1000, "KJ")
+    #ENERGIE CODE*****************************************************************************
+
+    print(f""" 
+CALCUL TERMINÉ : ANIMATION SAUVEGARDÉE
+#######################################################################################################""")
 with open('constants.yaml') as f:
     planets_constants = yaml.safe_load(f)
 
-p = 3   # Profondeur de l'abris [m]
-l_x = 3 # Largeur de l'abris en x [m]
-l_z = 3 # Hauteur de l'abris en z [m]
-Lx = 1 # Largeur du domaine [m]
+p = 1   # Profondeur de l'abris [m]
+l_x = 1 # Largeur de l'abris en x [m]
+l_z = 1 # Hauteur de l'abris en z [m]
+Lx = 3 # Largeur du domaine [m]
 Lz = 3 # Hauteur du domaine [m]
-d = 0.01  # Pas de discrétisation [m]
+d = 0.05  # Pas de discrétisation [m]
 
 
-methode_matrice_2D_temporelle(planets_constants['earth'],  p, l_x, l_z, Lx, Lz, d)
+methode_matrice_2D_temporelle(planets_constants['venus'],  p, l_x, l_z, Lx, Lz, d)
