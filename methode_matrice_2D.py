@@ -150,45 +150,45 @@ def methode_matrice_2D_b(planete, p, l_x, l_z, Lx, Lz, temps, d, abri=True):
 
     return b
 
-# # Variables pouvant changer
-# p=3 # (m)
-# l_x=3 # (m)
-# l_z=3 #(m)
-# Lx=15 #(m)
-# Lz=10 #(m)
-# temps=0 #(s)
-# d=0.1 #(m)
-# Nx=int(np.rint(Lx/d+1)) # Nombre de nœuds le long de X
-# Nz=int(np.rint(Lz/d+1)) # Nombre de nœuds le long de Z
+# Variables pouvant changer
+p=3 # (m)
+l_x=3 # (m)
+l_z=3 #(m)
+Lx=15 #(m)
+Lz=10 #(m)
+temps=0 #(s)
+d=0.1 #(m)
+Nx=int(np.rint(Lx/d+1)) # Nombre de nœuds le long de X
+Nz=int(np.rint(Lz/d+1)) # Nombre de nœuds le long de Z
 
-# with open('constants.yaml') as f:
-#     planets_constants = yaml.safe_load(f)
+with open('constants.yaml') as f:
+    planets_constants = yaml.safe_load(f)
 
-# # Obtention des matrices et du maillage
+# Obtention des matrices et du maillage
 
-# A, M = methode_matrice_2D_A(planets_constants['earth'], p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, d =d, sparse=True)
-# b = methode_matrice_2D_b(planets_constants['earth'], p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps = temps, d =d)
+A, M = methode_matrice_2D_A(planets_constants['earth'], p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, d =d, sparse=True)
+b = methode_matrice_2D_b(planets_constants['earth'], p=p, l_x=l_x, l_z=l_z, Lx=Lx, Lz=Lz, temps = temps, d =d)
 
-# # Résolution du système d'équations
-# T=np.zeros((Nx*Nz,1),dtype=np.double)
-# Tr=np.zeros((Nz,Nx),dtype=np.double)
+# Résolution du système d'équations
+T=np.zeros((Nx*Nz,1),dtype=np.double)
+Tr=np.zeros((Nz,Nx),dtype=np.double)
 
-# z = np.linspace(0, Lz, Nz)
-# x= np.linspace(0, Lx, Nx)
+z = np.linspace(0, Lz, Nz)
+x= np.linspace(0, Lx, Nx)
 
-# T = spsolve(A.tocsr(), b) # À utiliser si matrice pleine
+T = spsolve(A.tocsr(), b) # À utiliser si matrice pleine
 
-# # T = np.linalg.solve(A, b) # À utiliser is matrice creuse
+# T = np.linalg.solve(A, b) # À utiliser is matrice creuse
 
-# Tr=np.reshape(T,(Nz,Nx),order='F') # Convertion du vecteur colone de température en matrice dépendant de la position : T_ij->T(x,y)
+Tr=np.reshape(T,(Nz,Nx),order='F') # Convertion du vecteur colone de température en matrice dépendant de la position : T_ij->T(x,y)
 
-# # Affichage des données
-# plt.figure(1)
-# plt.pcolor(x,z,Tr)
-# plt.colorbar(mappable=None, cax=None, ax=None)
-# plt.title('T(x,y) [K]')
-# plt.xlabel('x [m]')
-# plt.ylabel('z [m]')
-# plt.gca().invert_yaxis()
-# plt.savefig('indepTemps.png')
+# Affichage des données
+plt.figure(1)
+plt.pcolor(x,z,Tr)
+plt.colorbar(mappable=None, cax=None, ax=None)
+plt.title('T(x,y) [K]')
+plt.xlabel('x [m]')
+plt.ylabel('z [m]')
+plt.gca().invert_yaxis()
+plt.savefig('indepTemps.png')
 
