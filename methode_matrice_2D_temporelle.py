@@ -13,15 +13,16 @@ import time
 import yaml
 from tqdm import tqdm
 
-def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d ):
+def methode_matrice_2D_temporelle (planets_constants, planete, p, l_x, l_z, Lx, Lz, d ):
+
     # Définition des constantes
-    C_p = planete['C_p']
-    K = planete['K']
-    rho = planete['rho']
-    tau = planete['tau']
-    Q_0 = planete['Q_0']
-    T_s = planete['T_s']
-    d_pS = planete['d_pS']
+    C_p = planets_constants['C_p']
+    K = planets_constants['K']
+    rho = planets_constants['rho']
+    tau = planets_constants['tau']
+    Q_0 = planets_constants['Q_0']
+    T_s = planets_constants['T_s']
+    d_pS = planets_constants['d_pS']
 
     alpha=C_p*rho/K
 
@@ -36,12 +37,12 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d ):
     abri = True # Est-ce qu'il y a un abri
 
     # Calcul de la distribution initiale
-    U0 = distributionInitiale(Nx, Nz, Lx, Lz, l_x, l_z, p, d, temps=0, abri=abri)
+    U0 = distributionInitiale(planete, Nx, Nz, Lx, Lz, l_x, l_z, p, d, temps=0, abri=abri)
     
     # Définition des matrices A, M et b0
 
-    A, M = methode_matrice_2D_A(planete, p, l_x, l_z, Lx, Lz, d, abri=abri)
-    b0 = methode_matrice_2D_b(planete, p, l_x, l_z, Lx, Lz, temps=0, d=d, abri=abri)
+    A, M = methode_matrice_2D_A(planets_constants[planete], p, l_x, l_z, Lx, Lz, d, abri=abri)
+    b0 = methode_matrice_2D_b(planets_constants[planete], p, l_x, l_z, Lx, Lz, temps=0, d=d, abri=abri)
 
     # Définition du pas de temps
     dt = np.min([alpha*d**2/2, tau/5 ])
@@ -139,15 +140,15 @@ CALCUL TERMINÉ : ANIMATION SAUVEGARDÉE
 
 # methode_matrice_2D_temporelle(planets_constants['earth'],  p, l_x, l_z, Lx, Lz, d)
 
-with open('constants.yaml') as f:
-     planets_constants = yaml.safe_load(f)
-
 p = 1   # Profondeur de l'abris [m]
 l_x = 1 # Largeur de l'abris en x [m]
 l_z = 1 # Hauteur de l'abris en z [m]
 Lx = 3 # Largeur du domaine [m]
 Lz = 3 # Hauteur du domaine [m]
 d = 0.05  # Pas de discrétisation [m]
+planete = 'earth'
 
+with open('constants.yaml') as f:
+    planetConstants = yaml.safe_load(f)
 
-methode_matrice_2D_temporelle(planets_constants['earth'],  p, l_x, l_z, Lx, Lz, d)
+methode_matrice_2D_temporelle(planetConstants[planete], planete, p, l_x, l_z, Lx, Lz, d)

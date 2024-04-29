@@ -55,7 +55,7 @@ def distributionInitiale(Nx, Nz, Lx, Lz, Ts, lx, lz, p):
 '''
 
 #--------------------------------------------------------------------------- Définition de la distribution initiale independante du temps
-def distributionInitiale(Nx, Nz, Lx, Lz, lx, lz, p, d, temps, abri):
+def distributionInitiale(planete, Nx, Nz, Lx, Lz, lx, lz, p, d, temps, abri):
     # Création d'une grille Nx par Nz
     x = np.linspace(0, Lx, Nx)
     z = np.linspace(0, Lz, Nz)
@@ -64,8 +64,8 @@ def distributionInitiale(Nx, Nz, Lx, Lz, lx, lz, p, d, temps, abri):
     with open('constants.yaml') as f:
         planets_constants = yaml.safe_load(f)
 
-    A, M = methode_matrice_2D_A(planets_constants['earth'], p=p, l_x=lx, l_z=lz, Lx=Lx, Lz=Lz, d=d, abri=abri)
-    b = methode_matrice_2D_b(planets_constants['earth'], p=p, l_x=lx, l_z=lz, Lx=Lx, Lz=Lz, temps = temps, d=d, abri=abri)
+    A, M = methode_matrice_2D_A(planets_constants[planete], p=p, l_x=lx, l_z=lz, Lx=Lx, Lz=Lz, d=d, abri=abri)
+    b = methode_matrice_2D_b(planets_constants[planete], p=p, l_x=lx, l_z=lz, Lx=Lx, Lz=Lz, temps = temps, d=d, abri=abri)
     
     # Résolution du système d'équations
     T=np.zeros((Nx*Nz,1),dtype=np.double)
@@ -86,11 +86,12 @@ def distributionInitiale(Nx, Nz, Lx, Lz, lx, lz, p, d, temps, abri):
 
 #----------------------------------------------------------------------------------- Affichage des données
 '''
+planete = 'earth'
 p = 1   # Profondeur de l'abris [m]
 lx = 1 # Largeur de l'abris en x [m]
 lz = 1 # Hauteur de l'abris en z [m]
-Lx = 10 # Largeur du domaine [m]
-Lz = 10 # Hauteur du domaine [m]
+Lx = 3 # Largeur du domaine [m]
+Lz = 3 # Hauteur du domaine [m]
 d = 0.05  # Pas de discrétisation [m]
 Nx=int(np.rint(Lx/d+1)) # Nombre de nœuds le long de X
 Nz=int(np.rint(Lz/d+1)) # Nombre de nœuds le long de Z
@@ -99,5 +100,6 @@ z = np.linspace(0, Lz, Nz)
 temps=0
 abri=True
 
-init_Col = distributionInitiale(Nx, Nz, Lx, Lz, lx, lz, p, d, temps, abri)
+init_Col = distributionInitiale(planete, Nx, Nz, Lx, Lz, lx, lz, p, d, temps, abri)
+
 '''

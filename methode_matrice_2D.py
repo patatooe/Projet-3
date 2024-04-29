@@ -9,16 +9,16 @@ import yaml
 
 ################ EVALUATION DE LA MATRICE A #################
 
-def methode_matrice_2D_A(planete, p, l_x, l_z, Lx, Lz, d , sparse = True, abri=True):
+def methode_matrice_2D_A(planets_constants, p, l_x, l_z, Lx, Lz, d , sparse = True, abri=True):
 
     # Récupération des constantes de la planète
-    C_p = planete['C_p']
-    K = planete['K']
-    rho = planete['rho']
-    tau = planete['tau']
-    Q_0 = planete['Q_0']
-    T_s = planete['T_s']
-    d_pS = planete['d_pS']
+    C_p = planets_constants['C_p']
+    K = planets_constants['K']
+    rho = planets_constants['rho']
+    tau = planets_constants['tau']
+    Q_0 = planets_constants['Q_0']
+    T_s = planets_constants['T_s']
+    d_pS = planets_constants['d_pS']
     sigma = 5.67e-8 # (W/(m^2K^4)) Constante de Stefan-Boltzmann
     
     Nx=int(np.rint(Lx/d+1)) # Nombre de nœuds le long de X
@@ -90,16 +90,16 @@ def methode_matrice_2D_A(planete, p, l_x, l_z, Lx, Lz, d , sparse = True, abri=T
 
 ################### EVALUATION DU VECTEUR b ############################
 
-def methode_matrice_2D_b(planete, p, l_x, l_z, Lx, Lz, temps, d, abri=True):
+def methode_matrice_2D_b(planets_constants, p, l_x, l_z, Lx, Lz, temps, d, abri=True):
 
     # Récupération des constantes de la planète
-    C_p = planete['C_p']
-    K = planete['K']
-    rho = planete['rho']
-    tau = planete['tau']
-    Q_0 = planete['Q_0']
-    T_s = planete['T_s']
-    d_pS = planete['d_pS']
+    C_p = planets_constants['C_p']
+    K = planets_constants['K']
+    rho = planets_constants['rho']
+    tau = planets_constants['tau']
+    Q_0 = planets_constants['Q_0']
+    T_s = planets_constants['T_s']
+    d_pS = planets_constants['d_pS']
     sigma = 5.67e-8 # (W/(m^2K^4)) Constante de Stefan-Boltzmann
     
     Nx=int(np.rint(Lx/d+1)) # Nombre de nœuds le long de X
