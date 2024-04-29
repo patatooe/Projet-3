@@ -147,14 +147,14 @@ Lz = 4 # Hauteur du domaine [m]
 d = 0.05  # Pas de discrétisation [m]
 
 
-# methode_matrice_2D_temporelle(planets_constants['earth'],  p, l_x, l_z, Lx, Lz, d)
+methode_matrice_2D_temporelle(planets_constants['earth'],  p, l_x, l_z, Lx, Lz, d)
 
-profondeur = [0.25,0.5,0.75,1,1.25,1.5,1.75,2,2.5]
-Energy_requise = []
-for p in profondeur:
-    Energy_requise.append(methode_matrice_2D_temporelle(planets_constants['earth'],  p, l_x, l_z, Lx, Lz, d))
+# profondeur = [0.25,0.5,0.75,1,1.25,1.5,1.75,2,2.5]
+# Energy_requise = []
+# for p in profondeur:
+#     Energy_requise.append(methode_matrice_2D_temporelle(planets_constants['earth'],  p, l_x, l_z, Lx, Lz, d))
     
-plt.plot(profondeur, Energy_requise)
-plt.xlabel("Profondeur de l'abri (m)")
-plt.ylabel("Energy (KJ/m)")
-plt.show()
+# plt.plot(profondeur, Energy_requise)
+# plt.xlabel("Profondeur de l'abri (m)")
+# plt.ylabel("Energy (KJ/m)")
+# plt.show()
