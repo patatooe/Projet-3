@@ -1,0 +1,39 @@
+#Constantes de la Terre 
+earth:
+  C_p: 675      # Capacité thermique [J/kgK]
+  K: 1          # Conductivité thermique [W/mK]
+  rho: 2000     # Masse volumique [kg/m^3]
+  tau: 83600    # Période de rotation [s]
+  Q_0: 492      # Rayonnement solaire [W/m^2]
+  T_s: 305.2    # Température moyenne [K]
+  d_pS: 1       # Distance Planète-Soleil [AU]
+
+# Constantes de Venus
+venus:
+  C_p: 1000 # Capacité thermique [J/kgK]
+  K: 2    # Conductivité thermique [W/mK]
+  rho: 3000  # Masse volumique [kg/m^3]
+  tau: 10500000    # Période de rotation [s]
+  Q_0: 70    # Rayonnement solaire [W/m^2]
+  T_s: 187.4    # Température moyenne [K]
+  d_pS: 0.72   # Distance Planète-Soleil [AU]
+
+# Constantes de Mars
+mars:
+  C_p: 500 # Capacité thermique [J/kgK]
+  K: 0.8    # Conductivité thermique [W/mK]
+  rho: 1500  # Masse volumique [kg/m^3]
+  tau: 44280    # Période de rotation [s]
+  Q_0: 308    # Rayonnement solaire [W/m^2]
+  T_s: 271.5    # Température moyenne [K]
+  d_pS: 1.52   # Distance Planète-Soleil [AU]
+
+# Constantes de Europe
+europe:
+  C_p: 750 # Capacité thermique [J/kgK]
+  K: 7        # Conductivité thermique [W/mK]
+  rho: 2750  # Masse volumique [kg/m^3]
+  tau: 151200    # Période de rotation [s]
+  Q_0: 50.26    # Rayonnement solaire [W/m^2]
+  T_s: 172.5    # Température moyenne [K]
+  d_pS: 5.2   # Distance Planète-Soleil [AU]
