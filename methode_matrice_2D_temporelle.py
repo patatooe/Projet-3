@@ -13,16 +13,19 @@ import time
 import yaml
 from tqdm import tqdm
 
-def methode_matrice_2D_temporelle (planets_constants, planete, p, l_x, l_z, Lx, Lz, d ):
+def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d ):
+
+    with open('constants.yaml') as f:
+        planets_constants = yaml.safe_load(f)
 
     # Définition des constantes
-    C_p = planets_constants['C_p']
-    K = planets_constants['K']
-    rho = planets_constants['rho']
-    tau = planets_constants['tau']
-    Q_0 = planets_constants['Q_0']
-    T_s = planets_constants['T_s']
-    d_pS = planets_constants['d_pS']
+    C_p = planets_constants[planete]['C_p']
+    K = planets_constants[planete]['K']
+    rho = planets_constants[planete]['rho']
+    tau = planets_constants[planete]['tau']
+    Q_0 = planets_constants[planete]['Q_0']
+    T_s = planets_constants[planete]['T_s']
+    d_pS = planets_constants[planete]['d_pS']
 
     alpha=C_p*rho/K
 
@@ -80,7 +83,7 @@ def methode_matrice_2D_temporelle (planets_constants, planete, p, l_x, l_z, Lx, 
     Progression :""")
 
     for t in tqdm(np.arange(dt, temps_deval, dt), total=nb_iterations):
-        bn_1 = methode_matrice_2D_b(planete, p, l_x, l_z, Lx, Lz, temps=t, d=d, abri=abri)
+        bn_1 = methode_matrice_2D_b(planets_constants[planete], p, l_x, l_z, Lx, Lz, temps=t, d=d, abri=abri)
 
 
         b_prime_1 = (M + dt*(1-xi)/(alpha*d**2)*A).dot(Un).flatten()
@@ -121,7 +124,7 @@ def methode_matrice_2D_temporelle (planets_constants, planete, p, l_x, l_z, Lx, 
 
         n=n+1
 
-    imageio.v2.mimsave('temperatureEarth.gif', images)
+    imageio.v2.mimsave(f'temperature {planete} .gif', images)
     return np.sum(np.array(Energy))
 
     print(f""" 
@@ -146,9 +149,7 @@ l_z = 1 # Hauteur de l'abris en z [m]
 Lx = 3 # Largeur du domaine [m]
 Lz = 3 # Hauteur du domaine [m]
 d = 0.05  # Pas de discrétisation [m]
-planete = 'earth'
+planete = 'venus'
 
-with open('constants.yaml') as f:
-    planetConstants = yaml.safe_load(f)
 
-methode_matrice_2D_temporelle(planetConstants[planete], planete, p, l_x, l_z, Lx, Lz, d)
+methode_matrice_2D_temporelle(planete, p, l_x, l_z, Lx, Lz, d)
