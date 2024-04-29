@@ -33,14 +33,12 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d ):
     z = np.linspace(0, Lz, Nz)
     x= np.linspace(0, Lx, Nx)
 
-    # Calcul de la distribution initiale
-    U0 = distributionInitiale(Nx, Nz, Lx, Lz, T_s, l_x, l_z, p)
-    # U0 = np.full((Nx*Nz,1), T_s)
-    U0r = np.reshape(U0,(Nz,Nx),order='F')
-    plot_temperature(x,z,U0r, 'distribInitiale') # Graphique de Distribution initiale
-
-    # Définition des matrices A, M et b0
     abri = True # Est-ce qu'il y a un abri
+
+    # Calcul de la distribution initiale
+    U0 = distributionInitiale(Nx, Nz, Lx, Lz, l_x, l_z, p, d, temps=0, abri=abri)
+    
+    # Définition des matrices A, M et b0
 
     A, M = methode_matrice_2D_A(planete, p, l_x, l_z, Lx, Lz, d, abri=abri)
     b0 = methode_matrice_2D_b(planete, p, l_x, l_z, Lx, Lz, temps=0, d=d, abri=abri)
@@ -140,3 +138,16 @@ CALCUL TERMINÉ : ANIMATION SAUVEGARDÉE
 
 
 # methode_matrice_2D_temporelle(planets_constants['earth'],  p, l_x, l_z, Lx, Lz, d)
+
+with open('constants.yaml') as f:
+     planets_constants = yaml.safe_load(f)
+
+p = 1   # Profondeur de l'abris [m]
+l_x = 1 # Largeur de l'abris en x [m]
+l_z = 1 # Hauteur de l'abris en z [m]
+Lx = 3 # Largeur du domaine [m]
+Lz = 3 # Hauteur du domaine [m]
+d = 0.05  # Pas de discrétisation [m]
+
+
+methode_matrice_2D_temporelle(planets_constants['earth'],  p, l_x, l_z, Lx, Lz, d)
