@@ -130,18 +130,6 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d ):
     print(f""" 
 CALCUL TERMINÉ : ANIMATION SAUVEGARDÉE
 #######################################################################################################""")
-# with open('constants.yaml') as f:
-#     planets_constants = yaml.safe_load(f)
-
-# p = 1   # Profondeur de l'abris [m]
-# l_x = 1 # Largeur de l'abris en x [m]
-# l_z = 1 # Hauteur de l'abris en z [m]
-# Lx = 3 # Largeur du domaine [m]
-# Lz = 3 # Hauteur du domaine [m]
-# d = 0.05  # Pas de discrétisation [m]
-
-
-# methode_matrice_2D_temporelle(planets_constants['earth'],  p, l_x, l_z, Lx, Lz, d)
 
 p = 1   # Profondeur de l'abris [m]
 l_x = 1 # Largeur de l'abris en x [m]
