@@ -1,9 +1,9 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from methode_matrice_2D import methode_matrice_2D_A
 from methode_matrice_2D import methode_matrice_2D_b
 from distributionInitiale import distributionInitiale
 from plot_temperature import plot_temperature
-import matplotlib.pyplot as plt
 import imageio.v2
 import os
 from scipy.sparse import lil_matrix, csc_matrix, csr_matrix, diags, eye
@@ -12,11 +12,8 @@ from scipy.sparse.linalg import spsolve
 import time
 import yaml
 from tqdm import tqdm
-from scipy.optimize import curve_fit
-from scipy.optimize import minimize
-from scipy.optimize import bisect
 
-def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d):
+def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d ):
 
     with open('constants.yaml') as f:
         planets_constants = yaml.safe_load(f)
@@ -84,7 +81,7 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d):
     - Temps: Évaluation sur {temps_deval} avec un pas de {dt} s sur {nb_iterations} itérations
 --------------------------------------------------------------------------------------------------------
     Progression :""")
-    Energy = [] #Liste pour stocker les energie a chaque temps t
+
     for t in tqdm(np.arange(dt, temps_deval, dt), total=nb_iterations):
         bn_1 = methode_matrice_2D_b(planets_constants[planete], p, l_x, l_z, Lx, Lz, temps=t, d=d, abri=abri)
 
@@ -103,47 +100,49 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d):
         plot_temperature(x,z,Unr, f'temperature2d{n}')
         images.append(imageio.v2.imread(f'temperature2d{n}.png'))
         os.remove(f'temperature2d{n}.png')
-        
-        if t<tau:
+
+        Energy = []
+        if t>tau:
             #ENERGIE CODE*****************************************************************************
-            P_tot = 0
-            P_updown = 0 #Puissance en W/m
-            P_side = 0 #Puissance en W/m
+            dT_tot = 0
             for i in range(Nz):
                 for j in range(Nx):
-                    if i == int(p/d) and j <= (l_x/(2*d)):
-                        dT_up = (3*Unr[i,j] - 4*Unr[i-1,j] + Unr[i-2,j])/(2*d) #Formule diff finie arriere second degre 
-                        P_updown += abs(K*l_x*dT_up)
-                    if i == int((l_z+p)/d) and j <= (l_x/(2*d)):
-                        dT_down = (-3*Unr[i,j] + 4*Unr[i+1,j] - Unr[i+2,j])/(2*d) #Formule diff finie avant second degre
-                        P_updown += abs(K*l_x*dT_down)
-                    if (p/d) < i < ((l_z+p)/d) and  j == int(l_x/(2*d)):
-                        dT_side = (-3*Unr[i,j] + 4*Unr[i,j+1] - Unr[i,j+2])/(2*d) #Formule diff finie avant second degre
-                        P_side += abs(K*l_z*dT_side)
-            
-            P_tot = P_side+P_updown
-            Energy.append((P_tot)*(tau))
+                    if (p/d-1) > i > (p/d+1) and j <= (l_x/(2*d)+1):
+                        dT_up = (Unr[i,j] - Unr[i-1,j])/(d)
+                        dT_tot += abs(dT_up)
+                    if ((l_z+p)/d-1)< i < ((l_z+p)/d+1) and j <= (l_x/(2*d)+1):
+                        dT_down = (Unr[i+1,j] - Unr[i,j])/(d)
+                        dT_tot += abs(dT_down)
+                    if i >= (p/d+1)  and  i <= ((l_z+p)/d+1) and (l_x/(2*d)-1) < j < (l_x/(2*d)+1):
+                        dT_side = (Unr[i,j+1] + Unr[i,j])/(d)
+                        dT_tot += abs(dT_side)
+        
+            Energy.append((2*l_x+l_z)*dT_tot)
             #ENERGIE FIN***********************************************************************************
         
 
 
         n=n+1
 
-    imageio.v2.mimsave('temperatureEarth.gif', images)
-    print("Energie totale (J/m) pour une periode de temps", (tau), "sec = ", (np.sum(np.array(Energy))/1000), "KJ/m")
+    imageio.v2.mimsave(f'temperature {planete} .gif', images)
+    return np.sum(np.array(Energy))
+
     print(f""" 
 CALCUL TERMINÉ : ANIMATION SAUVEGARDÉE
 #######################################################################################################""")
-    return np.sum(np.array(Energy))
 
+
+
+
+#--------------------------------------------------------------Test de la fct -----------------------------------------------------------
 
 p = 1   # Profondeur de l'abris [m]
 l_x = 1 # Largeur de l'abris en x [m]
 l_z = 1 # Hauteur de l'abris en z [m]
-Lx = 4 # Largeur du domaine [m]
-Lz = 4 # Hauteur du domaine [m]
+Lx = 3 # Largeur du domaine [m]
+Lz = 3 # Hauteur du domaine [m]
 d = 0.05  # Pas de discrétisation [m]
-planete = "earth"
+planete = 'venus'
+
 
 methode_matrice_2D_temporelle(planete, p, l_x, l_z, Lx, Lz, d)
-
