@@ -144,3 +144,5 @@ Lx = 3 # Largeur du domaine [m]
 Lz = 3 # Hauteur du domaine [m]
 d = 0.05  # Pas de discrétisation [m]
 planete = 'earth'
+
+methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d)
