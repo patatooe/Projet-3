@@ -43,7 +43,6 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d ):
     U0 = distributionInitiale(planete, Nx, Nz, Lx, Lz, l_x, l_z, p, d, temps=0, abri=abri)
     
     # Définition des matrices A, M et b0
-
     A, M = methode_matrice_2D_A(planets_constants[planete], p, l_x, l_z, Lx, Lz, d, abri=abri)
     b0 = methode_matrice_2D_b(planets_constants[planete], p, l_x, l_z, Lx, Lz, temps=0, d=d, abri=abri)
 
@@ -67,7 +66,7 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d ):
     # Images
     images = []
 
-    # Définition des paramètres initiales
+    # Définition des paramètres initiaux
     bn = b0
     Un = U0
 
@@ -82,6 +81,8 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d ):
 --------------------------------------------------------------------------------------------------------
     Progression :""")
 
+
+    Energy = [] #Liste pour stocker les energie a chaque temps t
     for t in tqdm(np.arange(dt, temps_deval, dt), total=nb_iterations):
         bn_1 = methode_matrice_2D_b(planets_constants[planete], p, l_x, l_z, Lx, Lz, temps=t, d=d, abri=abri)
 
@@ -95,42 +96,42 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d ):
         Un=Un_1
 
 
-        # Plot du graphique au temps t
+        # Plot du graphique de temperature au temps t
         Unr = np.reshape(Un_1,(Nz,Nx),order='F')
         plot_temperature(x,z,Unr, f'temperature2d{n}')
         images.append(imageio.v2.imread(f'temperature2d{n}.png'))
         os.remove(f'temperature2d{n}.png')
 
-        Energy = []
-        if t>tau:
+        if t<tau:
             #ENERGIE CODE*****************************************************************************
-            dT_tot = 0
+            P_tot = 0
+            P_updown = 0 #Puissance en W/m
+            P_side = 0 #Puissance en W/m
             for i in range(Nz):
                 for j in range(Nx):
-                    if (p/d-1) > i > (p/d+1) and j <= (l_x/(2*d)+1):
-                        dT_up = (Unr[i,j] - Unr[i-1,j])/(d)
-                        dT_tot += abs(dT_up)
-                    if ((l_z+p)/d-1)< i < ((l_z+p)/d+1) and j <= (l_x/(2*d)+1):
-                        dT_down = (Unr[i+1,j] - Unr[i,j])/(d)
-                        dT_tot += abs(dT_down)
-                    if i >= (p/d+1)  and  i <= ((l_z+p)/d+1) and (l_x/(2*d)-1) < j < (l_x/(2*d)+1):
-                        dT_side = (Unr[i,j+1] + Unr[i,j])/(d)
-                        dT_tot += abs(dT_side)
-        
-            Energy.append((2*l_x+l_z)*dT_tot)
+                    if i == int(p/d) and j <= (l_x/(2*d)):
+                        dT_up = (3*Unr[i,j] - 4*Unr[i-1,j] + Unr[i-2,j])/(2*d) #Formule diff finie arriere second degre 
+                        P_updown += abs(K*l_x*dT_up)
+                    if i == int((l_z+p)/d) and j <= (l_x/(2*d)):
+                        dT_down = (-3*Unr[i,j] + 4*Unr[i+1,j] - Unr[i+2,j])/(2*d) #Formule diff finie avant second degre
+                        P_updown += abs(K*l_x*dT_down)
+                    if (p/d) < i < ((l_z+p)/d) and  j == int(l_x/(2*d)):
+                        dT_side = (-3*Unr[i,j] + 4*Unr[i,j+1] - Unr[i,j+2])/(2*d) #Formule diff finie avant second degre
+                        P_side += abs(K*l_z*dT_side)
+            
+            P_tot = P_side+P_updown
+            Energy.append((P_tot)*(tau))
             #ENERGIE FIN***********************************************************************************
         
-
-
         n=n+1
 
+    # Combinaise de tous les graphiques de temperature aux temps t pour former un gif
     imageio.v2.mimsave(f'temperature {planete} .gif', images)
+
+    # Energie
+    print("Energie totale (J/m) pour une periode de temps", (tau), "sec = ", (np.sum(np.array(Energy))/1000), "KJ/m")
+    print(f""" CALCUL TERMINÉ : ANIMATION SAUVEGARDÉE #######################################################################################################""")
     return np.sum(np.array(Energy))
-
-    print(f""" 
-CALCUL TERMINÉ : ANIMATION SAUVEGARDÉE
-#######################################################################################################""")
-
 
 
 
@@ -142,7 +143,7 @@ l_z = 1 # Hauteur de l'abris en z [m]
 Lx = 3 # Largeur du domaine [m]
 Lz = 3 # Hauteur du domaine [m]
 d = 0.05  # Pas de discrétisation [m]
-planete = 'venus'
+planete = 'earth'
 
 
 methode_matrice_2D_temporelle(planete, p, l_x, l_z, Lx, Lz, d)
