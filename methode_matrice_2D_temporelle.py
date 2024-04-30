@@ -13,7 +13,7 @@ import time
 import yaml
 from tqdm import tqdm
 
-def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d ):
+def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d):
 
     with open('constants.yaml') as f:
         planets_constants = yaml.safe_load(f)
@@ -145,5 +145,4 @@ Lz = 3 # Hauteur du domaine [m]
 d = 0.05  # Pas de discrétisation [m]
 planete = 'earth'
 
-
-methode_matrice_2D_temporelle(planete, p, l_x, l_z, Lx, Lz, d)
+methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d)
