@@ -13,6 +13,9 @@ import time
 import yaml
 from tqdm import tqdm
 
+# Fonction qui definit les matrices dependantes du temps, resoud la temperature dans l'espace, 
+# fait un gif de l'evolution de la temperature en fonction du temps et qui calcule l'energie requise par l'abri en fonction du temps 
+
 def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d):
 
     with open('constants.yaml') as f:
@@ -28,7 +31,6 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d):
     d_pS = planets_constants[planete]['d_pS']
 
     alpha=C_p*rho/K
-
     xi =1
 
     # Calcul du nombre de points en x et z
@@ -53,6 +55,7 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d):
     temps_deval = 2*tau
     dt = temps_deval/nb_iterations
 
+    # Critere de convergence 
     if dt>(alpha*d**2) or dt>tau/10 :
         print(f"""
         ##################################################
@@ -81,8 +84,10 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d):
 --------------------------------------------------------------------------------------------------------
     Progression :""")
 
+    # Liste pour stocker les energie a chaque temps t
+    Energy = [] 
 
-    Energy = [] #Liste pour stocker les energie a chaque temps t
+    # Calcul de la temperature (U) en fonction du temps 
     for t in tqdm(np.arange(dt, temps_deval, dt), total=nb_iterations):
         bn_1 = methode_matrice_2D_b(planets_constants[planete], p, l_x, l_z, Lx, Lz, temps=t, d=d, abri=abri)
 
@@ -125,12 +130,13 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d):
         
         n=n+1
 
-    # Combinaise de tous les graphiques de temperature aux temps t pour former un gif
+    # Combinaison de tous les graphiques de temperature aux differents temps t pour former un gif
     imageio.v2.mimsave(f'temperature {planete} .gif', images)
 
     # Energie
     print("Energie totale (J/m) pour une periode de temps", (tau), "sec = ", (np.sum(np.array(Energy))/1000), "KJ/m")
     print(f""" CALCUL TERMINÉ : ANIMATION SAUVEGARDÉE #######################################################################################################""")
+    
     return np.sum(np.array(Energy))
 
 

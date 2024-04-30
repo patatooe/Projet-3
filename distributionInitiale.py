@@ -30,7 +30,7 @@ from plot_temperature import plot_temperature
 #         return gauss_dist_col
 
 
-#------------------------------------------------------------------------------- Définition de la distribution initiale avec abri
+#------------------------------------------------------------------------------- Définition de la distribution initiale avec abri au temps 0
 '''
 def distributionInitiale(Nx, Nz, Lx, Lz, Ts, lx, lz, p):
     # Création d'une grille Nx par Nz
@@ -54,7 +54,7 @@ def distributionInitiale(Nx, Nz, Lx, Lz, Ts, lx, lz, p):
     return init_dist_col
 '''
 
-#--------------------------------------------------------------------------- Définition de la distribution initiale independante du temps
+#--------------------------------------------------------------------------- Définition de la distribution initiale independante apres un certain temps
 def distributionInitiale(planete, Nx, Nz, Lx, Lz, lx, lz, p, d, temps, abri):
     # Création d'une grille Nx par Nz
     x = np.linspace(0, Lx, Nx)

@@ -4,9 +4,6 @@ from scipy.sparse import lil_matrix
 from scipy.sparse.linalg import spsolve
 import yaml
 
-
-
-
 ################ EVALUATION DE LA MATRICE A #################
 
 def methode_matrice_2D_A(planets_constants, p, l_x, l_z, Lx, Lz, d , sparse = True, abri=True):
