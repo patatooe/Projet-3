@@ -15,7 +15,7 @@ from scipy.optimize import bisect
 
 # profondeur = [0.25,0.5,0.75,1,1.1,1.2,1.25,1.3,1.5,1.75,2,2.5]
 
-def optimisation(planete, profondeur, taille,  p, l_x, l_z, Lx, Lz, d):
+def optimisation(planete, profondeur, l_x, l_z, Lx, Lz, d):
 
     
     with open('constants.yaml') as f:
@@ -31,10 +31,18 @@ def optimisation(planete, profondeur, taille,  p, l_x, l_z, Lx, Lz, d):
     
     #OPTIMISATION PROFONDEUR
     Energy_requise = []
-    for p in profondeur:
-         Energy_requise.append(methode_matrice_2D_temporelle(planete, p, l_x, l_z, Lx, Lz, d))
+    energie = []
     
-
+    for i in np.linspace(1,len(Energy_requise)+1,len(Energy_requise)):
+        for p in profondeur:
+            for lx in l_x:
+                for lz in l_z:
+                    energie = methode_matrice_2D_temporelle(planete, p, lx, lz, Lx, Lz, d)
+                    if energie < Energy_requise[i]:
+                        Energy_requise.append(energie)
+                        print(Energy_requise)
+    
+    '''
     def fun_fit(x, a, b, c):
         return a*np.exp(-x*b+d) +c*x
     
@@ -53,7 +61,7 @@ def optimisation(planete, profondeur, taille,  p, l_x, l_z, Lx, Lz, d):
     
     profondeur_min = x_fit[(y_fit.index(min(y_fit)))]
     print("Profondeur minimale = ", profondeur_min)
-
+    '''
 
     '''
     #******************************************************************************8
@@ -97,13 +105,16 @@ def optimisation(planete, profondeur, taille,  p, l_x, l_z, Lx, Lz, d):
 #---------------------------------------------------------test optimisation-----------------------
 
 p = 1
-l_x = 1 # Largeur de l'abris en x [m]
-l_z = 1 # Hauteur de l'abris en z [m]
+#l_x = 1 # Largeur de l'abris en x [m]
+#l_z = 1 # Hauteur de l'abris en z [m]
 Lx = 4 # Largeur du domaine [m]
 Lz = 4 # Hauteur du domaine [m]
 d = 0.05  # Pas de discrétisation [m] 
 planete = 'earth'
-profondeur = [0.25,0.5,0.75,1,1.25,1.5,1.75,2,2.5]
-taille = [0.25,0.5,0.75,1,1.1,1.2,1.25,1.3,1.5,1.75,2,2.5]
+#profondeur = [0.25,0.5,0.75,1,1.25,1.5,1.75,2,2.5]
+#taille = [0.25,0.5,0.75,1,1.1,1.2,1.25,1.3,1.5,1.75,2,2.5]
 
-optimisation(planete,profondeur,taille, p, l_x, l_z, Lx, Lz, d)
+profondeur = np.linspace(0,10,100)
+l_x = l_z = np.linspace(2,4,100)
+
+optimisation(planete,profondeur, l_x, l_z, Lx, Lz, d)
