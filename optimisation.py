@@ -58,13 +58,13 @@ def optimisation(planete, profondeur, taille, p, l_x, l_z, Lx, Lz,d):
     #******************************************************************************8
     #OPTIMISATION TAILLE
 
-    # p = profondeur_min
-    # Energy_requise_t = []
-    # for l in taille:
-    #     Energy_requise_t.append(methode_matrice_2D_temporelle(planete,  p, l, l, Lx, Lz, d))
+    p = profondeur_min
+    Energy_requise_t = []
+    for l in taille:
+         Energy_requise_t.append(methode_matrice_2D_temporelle(planete,  p, l, l, Lx, Lz, d))
     
     #Terre
-    Energy_requise_t = [253642678.83114666, 618932577.5651925, 1139178171.8183033, 1739438806.6334991, 2031815701.8194437, 2363014082.3926444, 2567477299.0788608, 2702821981.553166, 3515776000.5336275, 4887323176.337782, 6621310954.071945, 15274732819.35382]
+    #Energy_requise_t = [253642678.83114666, 618932577.5651925, 1139178171.8183033, 1739438806.6334991, 2031815701.8194437, 2363014082.3926444, 2567477299.0788608, 2702821981.553166, 3515776000.5336275, 4887323176.337782, 6621310954.071945, 15274732819.35382]
 
     x_taille = np.linspace(0,2.5,100)
     y_taille = []
@@ -104,4 +104,4 @@ planete = 'earth'
 profondeur = [0.25,0.5,0.75,1,1.25,1.5,1.75,2,2.5]
 taille = [0.25,0.5,0.75,1,1.1,1.2,1.25,1.3,1.5,1.75,2,2.5]
 
-optimisation(planete,profondeur,taille)
+optimisation(planete,profondeur,taille, l_x, l_z, Lx, Lz,d)
