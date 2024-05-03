@@ -125,9 +125,9 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d):
                         P_side += abs(K*l_z*dT_side)
             
             P_tot = P_side+P_updown
-            Energy.append((P_tot)*(tau))
+            Energy.append(2*(P_tot)*(tau)) #facteur 2 car demi-abri
             #ENERGIE FIN***********************************************************************************
-        
+
         n=n+1
 
     # Combinaison de tous les graphiques de temperature aux differents temps t pour former un gif
@@ -141,14 +141,42 @@ def methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d):
 
 
 
-#--------------------------------------------------------------Test de la fct -----------------------------------------------------------
-
+#--------------------------------------------------------------Generation de gifs avec les valeurs de p, lz et lx optimises-----------------------------------------------------------
+'''
 p = 1   # Profondeur de l'abris [m]
 l_x = 1 # Largeur de l'abris en x [m]
-l_z = 1 # Hauteur de l'abris en z [m]
+l_z = 0 # Hauteur de l'abris en z [m]
 Lx = 3 # Largeur du domaine [m]
 Lz = 3 # Hauteur du domaine [m]
 d = 0.05  # Pas de discrétisation [m]
-planete = 'earth'
+'''
 
-methode_matrice_2D_temporelle (planete, p, l_x, l_z, Lx, Lz, d)
+Lx = 50
+Lz = 50
+d = 0.1
+
+# Valeurs pour la Terre
+planeteT = 'earth'
+pT = 1.339
+l_zT = 10
+l_xT = 19.88
+
+# Valeurs pour Mars
+planeteM = 'mars'
+pM = 1.037
+l_zM = 10
+l_xM = 18.824
+
+# Valeurs pour Venus
+planeteV = 'venus'
+pV = 2.612
+l_zV = 10
+l_xV = 3.657
+
+# Valeurs pour Europe
+planeteE = 'europe'
+pE = 0.192
+l_zE = 5 
+l_xE = 1.929
+
+methode_matrice_2D_temporelle (planeteM, pM, l_xM, l_zM, Lx, Lz, d)
